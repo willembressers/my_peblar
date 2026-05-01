@@ -6,7 +6,7 @@ def charger(data):
 
     for state in data[0]:
         # skip unavailable values
-        if state["state"] == "unavailable":
+        if state.get("state", "") == "unavailable":
             continue
 
         # unwrap the attributes into the main dict
@@ -26,7 +26,15 @@ def tariff(data):
         if state["state"] == "unavailable":
             continue
 
-        for forcast in state["attributes"]["forecast"]:
-            tariffs.append(forcast)
+        attributes = state.get("attributes")
+        if attributes:
+            forecasts = attributes.get("forecast")
+            if forecasts:
+                for forecast in forecasts:
+                    tariffs.append(forecast)
 
     return pd.DataFrame(tariffs)
+
+
+def statistics(data, entity_id):
+    return pd.DataFrame(data.get(entity_id, []))
